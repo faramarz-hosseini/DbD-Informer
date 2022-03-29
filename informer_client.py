@@ -53,7 +53,7 @@ class InformerClient(Client):
 
             parsed_stats = self._parse_stats(stats=stats, steamid=steamid)
             msg_txt = "\n".join(
-                field + ": " + str(value)
+                field + ": " + value
                 for field, value in parsed_stats.items()
             )
             await message.reply("**" + url + "**" + ":\n" + msg_txt)
@@ -108,17 +108,19 @@ class InformerClient(Client):
     @staticmethod
     def _sort_stats(stats: Dict):
         sorted_stats = {}
+
         for field_name in STEAM_STATS:
             val = stats[field_name]
             if isinstance(val, int) or isinstance(val, float):
                 val = f'{round(val):,}'
-            sorted_stats[field_name] = stats[field_name] \
+            sorted_stats[field_name] = val \
                 if field_name not in SPACE_NEEDED_FIELDS else val+"\n"
+
         for field_name in DBD_STATS_MAP.values():
             val = stats[field_name]
             if isinstance(val, int) or isinstance(val, float):
                 val = f'{round(val):,}'
-            sorted_stats[field_name] = stats[field_name] \
+            sorted_stats[field_name] = val \
                 if field_name not in SPACE_NEEDED_FIELDS else val+"\n"
 
         return sorted_stats
