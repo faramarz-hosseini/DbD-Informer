@@ -1,3 +1,15 @@
+class MsgField:
+    K_RANK = ":knife: Killer Rank"
+    S_RANK = ":woman_running: Survivor Rank"
+    TOTAL_BP = ":drop_of_blood: Total Bloodpoints"
+    PIP_SCORE = ":medal: Pip Score"
+    PLAY_TIME = ":hourglass: Time Played"
+    ESCAPES = ":door: Total Escapes"
+    GENS_DONE = ":wrench: Generators Repaired"
+    SAC_SURVS = ":dagger: Survivors Sacrificed"
+    BASEMENT_HOOKED = ":house_abandoned: Survivors Hooked in Basement"
+
+
 DBD_RANK_PIPS = {
     0: "Ash IV",
     3: "Ash III",
@@ -22,17 +34,28 @@ DBD_RANK_PIPS = {
 }
 
 STEAM_STATS = (
-    ":hourglass: Time Played",
+    MsgField.PLAY_TIME,
 )
 
 DBD_STATS_MAP = {
-    "DBD_KillerSkulls": ":knife: Killer Rank",
-    "DBD_CamperSkulls": ":woman_running: Survivor Rank",
-    "DBD_BloodwebPoints": ":drop_of_blood: Total Bloodpoints",
-    "DBD_UnlockRanking": ":medal: Pip Score",
+    "DBD_KillerSkulls": MsgField.K_RANK,
+    "DBD_CamperSkulls": MsgField.S_RANK,
+    "DBD_Escape": MsgField.ESCAPES,
+    "DBD_GeneratorPct_float": MsgField.GENS_DONE,
+    "DBD_SacrificedCampers": MsgField.SAC_SURVS,
+    "DBD_DLC6_Slasher_Stat2": MsgField.BASEMENT_HOOKED,
+    "DBD_BloodwebPoints": MsgField.TOTAL_BP,
+    "DBD_UnlockRanking": MsgField.PIP_SCORE,
 }
 
 SPACE_NEEDED_FIELDS = (
-    ":woman_running: Survivor Rank",
-    ":hourglass: Time Played",
+    MsgField.S_RANK,
+    MsgField.PLAY_TIME,
+    MsgField.GENS_DONE,
+    MsgField.BASEMENT_HOOKED,
 )
+
+SHRINE_MSG = "**Available perks in Shrine right now:**\n\n" \
+              " 1) {}\n 2) {}\n 3) {}\n 4) {}\n\n" \
+              "**Shrine of Secrets resets in: {} day(s) and {} hour(s)**"
+RANK_RESET_MSG = "Rank reset happens in: {} day(s) and {} hour(s)"

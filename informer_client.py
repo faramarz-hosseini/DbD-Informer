@@ -8,7 +8,10 @@ from discord import (
     Client, Message
 )
 
-from const import DBD_STATS_MAP, SPACE_NEEDED_FIELDS, STEAM_STATS
+from const import (
+    DBD_STATS_MAP, SPACE_NEEDED_FIELDS, STEAM_STATS, MsgField,
+    SHRINE_MSG, RANK_RESET_MSG,
+)
 from utils import convert_pips_to_rank
 
 
@@ -49,9 +52,8 @@ class InformerClient(Client):
                 continue
 
             parsed_stats = self._parse_stats(stats=stats, steamid=steamid)
-
             msg_txt = "\n".join(
-                field + ": " + f'{value:,}' if isinstance(value, int) else field + ": " + str(value)
+                field + ": " + str(value)
                 for field, value in parsed_stats.items()
             )
             await message.reply("**" + url + "**" + ":\n" + msg_txt)
@@ -59,12 +61,14 @@ class InformerClient(Client):
     async def shrine(self, message: Message, *args):
         shrine_info = requests.get(self.SHRINE_API).json()
         current_shrine_end = float(shrine_info["end"])
+        perks = [perk_dic['id'] for perk_dic in shrine_info['perks']]
         seconds_until_end = current_shrine_end - datetime.now().timestamp()
         days = seconds_until_end // 3600 // 24
         hours = (seconds_until_end // 3600) % 24
+
         await message.reply(
-            "Shrine of Secrets resets in: {} day(s) and {} hour(s)".format(
-                int(days), int(hours)
+            SHRINE_MSG.format(
+                *perks, int(days), int(hours)
             )
         )
 
@@ -74,7 +78,7 @@ class InformerClient(Client):
         days = seconds_until_reset // 3600 // 24
         hours = (seconds_until_reset // 3600) % 24
         await message.reply(
-            "Rank reset happens in: {} day(s) and {} hour(s)".format(
+            RANK_RESET_MSG.format(
                 int(days), int(hours)
             )
         )
@@ -87,17 +91,17 @@ class InformerClient(Client):
                 parsed_stats[field_name] = stat['value']
 
         k_rank = self._convert_role_pips_to_rank(
-            pips=parsed_stats.get(':knife: Killer Rank')
+            pips=parsed_stats.get(MsgField.K_RANK)
         )
-        parsed_stats[':knife: Killer Rank'] = k_rank if k_rank is not None else "No rank yet"
+        parsed_stats[MsgField.K_RANK] = k_rank if k_rank is not None else "No rank yet"
 
         s_rank = self._convert_role_pips_to_rank(
-            pips=parsed_stats.get(":woman_running: Survivor Rank")
+            pips=parsed_stats.get(MsgField.S_RANK)
         )
-        parsed_stats[":woman_running: Survivor Rank"] = s_rank if s_rank is not None else "No rank yet"
+        parsed_stats[MsgField.S_RANK] = s_rank if s_rank is not None else "No rank yet"
 
         time_played = self._get_time_play_stat(steamid)
-        parsed_stats[":hourglass: Time Played"] = time_played
+        parsed_stats[MsgField.PLAY_TIME] = time_played
 
         return self._sort_stats(parsed_stats)
 
@@ -105,11 +109,17 @@ class InformerClient(Client):
     def _sort_stats(stats: Dict):
         sorted_stats = {}
         for field_name in STEAM_STATS:
+            val = stats[field_name]
+            if isinstance(val, int) or isinstance(val, float):
+                val = f'{round(val):,}'
             sorted_stats[field_name] = stats[field_name] \
-                if field_name not in SPACE_NEEDED_FIELDS else stats[field_name]+"\n"
+                if field_name not in SPACE_NEEDED_FIELDS else val+"\n"
         for field_name in DBD_STATS_MAP.values():
+            val = stats[field_name]
+            if isinstance(val, int) or isinstance(val, float):
+                val = f'{round(val):,}'
             sorted_stats[field_name] = stats[field_name] \
-                if field_name not in SPACE_NEEDED_FIELDS else stats[field_name]+"\n"
+                if field_name not in SPACE_NEEDED_FIELDS else val+"\n"
 
         return sorted_stats
 
