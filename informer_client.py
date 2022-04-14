@@ -84,7 +84,7 @@ class InformerClient(Client):
         )
 
     def _parse_stats(self, stats: Dict, steamid: str) -> Dict:
-        parsed_stats = {}
+        parsed_stats = {field: 0 for field in DBD_STATS_MAP.values()}
         for stat in stats:
             if stat['name'] in DBD_STATS_MAP:
                 field_name = DBD_STATS_MAP[stat['name']]
